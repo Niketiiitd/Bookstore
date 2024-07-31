@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Homepage from '../components/Homepage'
+import Homepage from './components/Homepage'
 import './index.css'
 function App() {
   const [count, setCount] = useState(0)
