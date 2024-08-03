@@ -29,8 +29,13 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
+app.post('/SigninCheck', (req, res) => {
+    // code for signin 
+
+    
+});
 app.post('/loginCheck', (req, res) => {
-    const { phone, password, userType } = req.body;
+    const { id, password, userType } = req.body;
     const validUserTypes = ['Customer', 'Vendor', 'DeliveryAgent', 'Admin']; // Add other valid user types if needed
     if (!validUserTypes.includes(userType)) {
         res.status(400).send('Invalid user type');
@@ -39,34 +44,37 @@ app.post('/loginCheck', (req, res) => {
 
     let query;
     if (userType === 'Customer') {
-        query = 'SELECT customer_password FROM Customer WHERE phone_number = ?';
+        query = 'SELECT customer_id FROM Customer WHERE phone_number = ? AND customer_password = ?';
     } else if (userType === 'Vendor') {
-        query = 'SELECT vendor_password FROM Vendor WHERE Phone_number = ?';
+        query = 'SELECT VendorID FROM Vendor WHERE Phone_number = ? AND vendor_password = ?';
     } else if (userType === 'DeliveryAgent') {
         // cursor.execute("SELECT da_name FROM DeliveryAgent WHERE da_name = %s AND da_password = %s", (da_name, da_pass))
-        query = 'SELECT da_password FROM DeliveryAgent WHERE da_name = ?';
+        query = 'SELECT daID FROM DeliveryAgent WHERE da_name = ? AND da_password = ?';
     } else if (userType === 'Admin') {
-        query = 'SELECT admin_password FROM Admin WHERE phone_number = ?';
+        // cursor.execute("SELECT hashed_password FROM MAIN_ADMIN WHERE adminID = %s", (admin_id,))
+        query = 'SELECT adminID FROM MAIN_ADMIN WHERE adminID = ? AND hashed_password = ?';
     }
-
-    db.query(query, [password], (err, result) => {
+    console.log('Executing query:', query);
+    console.log('With parameters:', [id, password]);
+    // id = id.trim();
+    // password = password.trim();
+    db.query(query, [id,password], (err, result) => {
         if (err) {
             console.error('Error executing query', err);
             res.status(500).send('Error');
             return;
         }
+        console.log('Query result:', result);
         if (result.length === 0) {
             res.status(401).send('User not found');
             return;
         }
-
-        const user = result[0];
-        const storedPassword = user[Object.keys(user)[0]]; // Get the password field dynamically
-        if (storedPassword !== password) {
-            res.status(401).send('Incorrect password');
-            return;
-        }
-        res.status(200).send('User found');
+        const customerID = result[0].customer_id;
+        console.log('Customer ID:', customerID);
+        res.json({
+            customer_id: customerID,
+            userType: req.body.userType
+        });
     });
 });
 
