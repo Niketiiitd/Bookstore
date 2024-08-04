@@ -1,4 +1,6 @@
+import { ChakraProvider } from '@chakra-ui/react';
 import axios from 'axios';
+
 import { useEffect, useState } from 'react';
 import CustomerLandingPage from './components/CustomerLandingPage';
 import Homepage from './components/Homepage';
@@ -28,7 +30,7 @@ function App() {
   },[customerData]);
   
   return (
-    
+    <ChakraProvider>
     <div className='italic'>
       {!renderToLandingPage ? (
         <Homepage onUserAuthenticated={handleUserAuthenticated} />
@@ -41,6 +43,7 @@ function App() {
         </>
       )}
     </div>
+    </ChakraProvider>
 )};
 
 export default App
