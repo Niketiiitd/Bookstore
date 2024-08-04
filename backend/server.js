@@ -78,6 +78,43 @@ app.post('/loginCheck', (req, res) => {
     });
 });
 
+app.post('/getAllBooks', (req, res) => {
+    const query = 'SELECT * FROM Book';
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error('Error executing query', err);
+            res.status(500).send('Error');
+            return;
+        }
+        if (result.length === 0) {
+            res.status(401).send('No books found');
+            return;
+        }
+        console.log('Books:', result);
+        // book_id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+        // book_title VARCHAR(255) NOT NULL,
+        // book_author VARCHAR(255) NOT NULL,
+        // book_genre VARCHAR(255) NOT NULL,
+        // book_series VARCHAR(255) NOT NULL,
+        // book_publication VARCHAR(255) NOT NULL,
+        // book_availability INT NOT NULL,
+        // VendorID INT,
+        // book_price INT NOT NULL,
+        // CONSTRAINT chk_product_price_positive CHECK (book_price >= 0), -- Ensure non-negative product price
+        // FOREIGN KEY (VendorID) REFERENCES Vendor(VendorID)
+        res.json(result.map(book => ({
+            book_id: book.book_id,
+            book_title: book.book_title,
+            book_author: book.book_author,
+            book_genre: book.book_genre,
+            book_series: book.book_series,
+            book_publication: book.book_publication,
+            book_availability: book.book_availability,
+            VendorID: book.VendorID,
+            book_price: book.book_price
+        })));
+    });
+});
 
 app.post('/SignNewUser',(req,res)=>{
     const {email,password,userType} = req.body;
