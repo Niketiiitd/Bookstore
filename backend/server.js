@@ -77,7 +77,36 @@ app.post('/loginCheck', (req, res) => {
         });
     });
 });
-
+app.post('/getCartItems', (req, res) => {
+    const { customer_id } = req.body;
+    const query = 'SELECT * FROM Cart WHERE customer_id = ?';
+    db.query(query, [customer_id], (err, result) => {
+        if (err) {
+            console.error('Error executing query', err);
+            res.status(500).send('Error');
+            return;
+        }
+        if (result.length === 0) {
+            res.status(401).send('No items found in cart');
+            return;
+        }
+        console.log('Cart items:', result);
+        // cart_id INT AUTO_INCREMENT PRIMARY KEY,
+        // cart_price BIGINT,
+        // customer_id INT NOT NULL,
+        // book_id INT NOT NULL,
+        // quantity INT NOT NULL,
+        // CONSTRAINT chk_quantity_positive CHECK (quantity > 0), -- Ensure quantity is greater than 0
+        // FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+    
+        // FOREIGN KEY (book_id) REFERENCES Book(book_id)
+        res.json(result.map(item => ({
+            cartPrice: item.cart_price,
+            bookID: item.book_id,
+            quantity: item.quantity
+        })));
+    });
+});
 app.post('/getAllBooks', (req, res) => {
     const query = 'SELECT * FROM Book';
     db.query(query, (err, result) => {
@@ -115,6 +144,7 @@ app.post('/getAllBooks', (req, res) => {
         })));
     });
 });
+
 
 app.post('/SignNewUser',(req,res)=>{
     const {email,password,userType} = req.body;
