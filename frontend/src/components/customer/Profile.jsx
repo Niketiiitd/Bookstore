@@ -1,10 +1,11 @@
 import React from "react";
 
 
-function Profile() {
+function Profile({customerId}) {
     return (
         <div>
             <h1>Profile Page</h1>
+            
         </div>
     );
 }
